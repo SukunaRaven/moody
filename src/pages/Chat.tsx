@@ -44,10 +44,9 @@ const Chat = () => {
 
         try {
             // Convert entire conversation for the backend
-            const apiMessages = [...messages, userMessage].map((m) => ({
-                role: m.role,
-                content: m.content,
-            }));
+            const apiMessages = [
+                { role: 'user', content: userMessage.content },
+            ];
 
             const res = await fetch('http://localhost:8000/chat', {
                 method: 'POST',

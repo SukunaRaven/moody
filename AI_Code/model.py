@@ -74,6 +74,7 @@ def send_to_llm(messages: list[ChatMessage]) -> str:
     try:
         prompt = build_prompt(messages)
 
+        print("Message received: " + str(messages))
         output = llm(
             prompt,
             max_new_tokens=150,
@@ -85,6 +86,8 @@ def send_to_llm(messages: list[ChatMessage]) -> str:
         )
 
         text = output[0]["generated_text"]
+
+        print("RESPONSE: " + str(text.split("<|assistant|>")[-1].strip()))
 
         # Get the last assistant turn
         return text.split("<|assistant|>")[-1].strip()
