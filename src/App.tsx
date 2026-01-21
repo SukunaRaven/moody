@@ -9,6 +9,7 @@ import Log from "./pages/Log";
 import Insights from "./pages/Insights";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
+import Coach from "@/pages/Coach.tsx";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
                     <Route path="/" element={<Index />} />
                     <Route path="/log" element={<Log />} />
                     <Route path="/insights" element={<Insights />} />
+                    <Route path="/coach" element={<Coach />} />
                     <Route path="/chat" element={<Chat />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
