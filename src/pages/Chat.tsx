@@ -16,14 +16,18 @@ const Chat = () => {
         {
             id: '1',
             role: 'assistant',
-            content: "Hi! I'm Moody, your mental wellness companion. I'm here to help you reflect on your emotions and provide support. How are you feeling today?",
-            timestamp: new Date()
-        }
+            content:
+                "Hi! I'm Moody, your mental wellness companion. I'm here to help you reflect on your emotions and provide support. How are you feeling today?",
+            timestamp: new Date(),
+        },
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [apiConnected] = useState(false); // Will be true when AI API is connected
+    const [apiConnected] = useState(true);
 
+    // -----------------------------
+    // MEMORY + FASTAPI AI CALL
+    // -----------------------------
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -31,32 +35,50 @@ const Chat = () => {
             id: crypto.randomUUID(),
             role: 'user',
             content: input,
-            timestamp: new Date()
+            timestamp: new Date(),
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        setMessages((prev) => [...prev, userMessage]);
         setInput('');
         setIsLoading(true);
 
-        // Simulate AI response (replace with actual API call)
-        setTimeout(() => {
-            const responses = [
-                "I hear you. It's completely normal to feel that way. Would you like to talk more about what's on your mind?",
-                "Thank you for sharing. Remember, every feeling is valid. What do you think might help you feel better right now?",
-                "That sounds challenging. Sometimes just acknowledging our feelings can be the first step. Have you been able to take any time for yourself today?",
-                "I understand. It's okay to have difficult days. What usually helps you when you're feeling this way?"
-            ];
+        try {
+            // Convert entire conversation for the backend
+            const apiMessages = [...messages, userMessage].map((m) => ({
+                role: m.role,
+                content: m.content,
+            }));
+
+            const res = await fetch('http://localhost:8000/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: apiMessages }),
+            });
+
+            const data = await res.json();
 
             const assistantMessage: Message = {
                 id: crypto.randomUUID(),
                 role: 'assistant',
-                content: responses[Math.floor(Math.random() * responses.length)],
-                timestamp: new Date()
+                content: data.response,
+                timestamp: new Date(),
             };
 
-            setMessages(prev => [...prev, assistantMessage]);
-            setIsLoading(false);
-        }, 1500);
+            setMessages((prev) => [...prev, assistantMessage]);
+        } catch (err) {
+            console.error(err);
+
+            const fallback: Message = {
+                id: crypto.randomUUID(),
+                role: 'assistant',
+                content: 'Sorry, I could not reach the AI.',
+                timestamp: new Date(),
+            };
+
+            setMessages((prev) => [...prev, fallback]);
+        }
+
+        setIsLoading(false);
     };
 
     return (
@@ -93,28 +115,33 @@ const Chat = () => {
                         <div
                             key={message.id}
                             className={cn(
-                                "flex gap-3 animate-fade-in",
-                                message.role === 'user' ? "flex-row-reverse" : ""
+                                'flex gap-3 animate-fade-in',
+                                message.role === 'user' ? 'flex-row-reverse' : ''
                             )}
                             style={{ animationDelay: `${index * 100}ms` }}
                         >
-                            <div className={cn(
-                                "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-                                message.role === 'user'
-                                    ? "bg-primary/10"
-                                    : "gradient-calm"
-                            )}>
-                                {message.role === 'user'
-                                    ? <User className="w-4 h-4 text-primary" />
-                                    : <Bot className="w-4 h-4 text-primary-foreground" />
-                                }
+                            <div
+                                className={cn(
+                                    'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                                    message.role === 'user'
+                                        ? 'bg-primary/10'
+                                        : 'gradient-calm'
+                                )}
+                            >
+                                {message.role === 'user' ? (
+                                    <User className="w-4 h-4 text-primary" />
+                                ) : (
+                                    <Bot className="w-4 h-4 text-primary-foreground" />
+                                )}
                             </div>
-                            <div className={cn(
-                                "max-w-[80%] rounded-2xl px-4 py-3",
-                                message.role === 'user'
-                                    ? "bg-primary text-primary-foreground rounded-tr-sm"
-                                    : "bg-card shadow-soft rounded-tl-sm"
-                            )}>
+                            <div
+                                className={cn(
+                                    'max-w-[80%] rounded-2xl px-4 py-3',
+                                    message.role === 'user'
+                                        ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                                        : 'bg-card shadow-soft rounded-tl-sm'
+                                )}
+                            >
                                 <p className="text-sm leading-relaxed">{message.content}</p>
                             </div>
                         </div>
@@ -127,9 +154,18 @@ const Chat = () => {
                             </div>
                             <div className="bg-card shadow-soft rounded-2xl rounded-tl-sm px-4 py-3">
                                 <div className="flex gap-1">
-                                    <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <span
+                                        className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"
+                                        style={{ animationDelay: '0ms' }}
+                                    />
+                                    <span
+                                        className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"
+                                        style={{ animationDelay: '150ms' }}
+                                    />
+                                    <span
+                                        className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"
+                                        style={{ animationDelay: '300ms' }}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -143,7 +179,9 @@ const Chat = () => {
                     <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                        onKeyDown={(e) =>
+                            e.key === 'Enter' && !e.shiftKey && handleSend()
+                        }
                         placeholder="Share what's on your mind..."
                         className="flex-1 rounded-xl"
                         disabled={isLoading}
