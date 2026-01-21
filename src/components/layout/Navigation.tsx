@@ -6,7 +6,7 @@ const navItems = [
     { to: '/', icon: Home, label: 'Home' },
     { to: '/log', icon: PlusCircle, label: 'Log' },
     { to: '/insights', icon: BarChart3, label: 'Insights' },
-    { to: '/coach', icon: HeartHandshake, label: 'Coach' },
+    { to: '/coach', icon: HeartHandshake, label: 'CoachSetup' },
     { to: '/chat', icon: MessageCircle, label: 'Chat' },
 ];
 
