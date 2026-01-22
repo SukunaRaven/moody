@@ -1,15 +1,22 @@
+/* ================================
+   GOOGLE FONTS (MOET EERST)
+   ================================ */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&family=Varta:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&family=Varta:wght@300;400;500;600;700&display=swap');
-
+/* ================================
+   BASE THEME VARIABLES + TYPOGRAPHY
+   ================================ */
 @layer base {
     :root {
-        /* Moody / Wireframe palette */
+        /* Background & text */
         --background: 245 100% 97%; /* #F2F0FF */
-        --foreground: 214 81% 10%; /* ~ #051A2F */
+        --foreground: 214 81% 10%; /* #051A2F */
 
+        /* Cards */
         --card: 0 0% 100%;
         --card-foreground: 214 81% 10%;
 
@@ -20,19 +27,19 @@
         --primary: 221 63% 48%; /* #2C5FCB */
         --primary-foreground: 0 0% 100%;
 
-        /* Secondary (soft surface) */
+        /* Secondary */
         --secondary: 240 20% 96%;
         --secondary-foreground: 214 81% 10%;
 
-        /* Muted */
+        /* Muted text */
         --muted: 240 12% 92%;
-        --muted-foreground: 220 9% 46%; /* ~ #6B7280 */
+        --muted-foreground: 220 9% 46%; /* #6B7280 */
 
         /* Accent (purple) */
         --accent: 251 45% 59%; /* #7766C6 */
         --accent-foreground: 0 0% 100%;
 
-        /* Destructive (red) */
+        /* Danger */
         --destructive: 0 73% 64%; /* #EB5757 */
         --destructive-foreground: 0 0% 100%;
 
@@ -42,7 +49,7 @@
 
         --radius: 1rem;
 
-        /* Mood colors aligned to styleguide */
+        /* Mood colors */
         --mood-great: 158 50% 48%;
         --mood-good: 221 63% 48%;
         --mood-okay: 45 100% 58%;
@@ -50,98 +57,89 @@
         --mood-bad: 0 73% 64%;
 
         /* Gradients */
-        --gradient-calm: linear-gradient(135deg, #2C5FCB 0%, #7766C6 100%);
-        --gradient-warm: linear-gradient(135deg, #FFC212 0%, #EB5757 100%);
-        --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.88) 100%);
         --gradient-hero: linear-gradient(135deg, #F2F0FF 0%, #EDF2FF 50%, #F2F0FF 100%);
+        --gradient-calm: linear-gradient(135deg, #2C5FCB 0%, #7766C6 100%);
+        --gradient-card: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.95),
+                rgba(255, 255, 255, 0.88)
+        );
 
         /* Shadows */
         --shadow-soft: 0 2px 16px -8px hsl(214 81% 10% / 0.12);
         --shadow-card: 0 8px 24px -12px hsl(214 81% 10% / 0.18);
-        --shadow-elevated: 0 18px 42px -18px hsl(214 81% 10% / 0.22);
-
-        /* Sidebar */
-        --sidebar-background: 245 100% 97%;
-        --sidebar-foreground: 214 81% 10%;
-        --sidebar-primary: 221 63% 48%;
-        --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 240 20% 96%;
-        --sidebar-accent-foreground: 214 81% 10%;
-        --sidebar-border: 240 10% 90%;
-        --sidebar-ring: 221 63% 48%;
-    }
-
-    .dark {
-        --background: 214 81% 10%;
-        --foreground: 240 20% 96%;
-
-        --card: 214 70% 13%;
-        --card-foreground: 240 20% 96%;
-
-        --popover: 214 70% 13%;
-        --popover-foreground: 240 20% 96%;
-
-        --primary: 221 63% 58%;
-        --primary-foreground: 214 81% 10%;
-
-        --secondary: 214 40% 16%;
-        --secondary-foreground: 240 20% 96%;
-
-        --muted: 214 30% 18%;
-        --muted-foreground: 240 10% 70%;
-
-        --accent: 251 45% 65%;
-        --accent-foreground: 214 81% 10%;
-
-        --destructive: 0 73% 64%;
-        --destructive-foreground: 0 0% 100%;
-
-        --border: 214 25% 22%;
-        --input: 214 25% 22%;
-        --ring: 221 63% 58%;
-
-        --gradient-calm: linear-gradient(135deg, hsl(221 63% 58%) 0%, hsl(251 45% 65%) 100%);
-        --gradient-hero: linear-gradient(135deg, hsl(214 81% 10%) 0%, hsl(214 70% 13%) 100%);
-
-        --sidebar-background: 214 81% 10%;
-        --sidebar-foreground: 240 20% 96%;
-        --sidebar-primary: 221 63% 58%;
-        --sidebar-primary-foreground: 214 81% 10%;
-        --sidebar-accent: 214 40% 16%;
-        --sidebar-accent-foreground: 240 20% 96%;
-        --sidebar-border: 214 25% 22%;
-        --sidebar-ring: 221 63% 58%;
     }
 
     * {
         @apply border-border;
     }
 
+    /* ================================
+       GLOBAL DEFAULT
+       ================================ */
     body {
         @apply bg-background text-foreground antialiased;
-        font-family: 'Varta', system-ui, sans-serif;
+        font-family: 'Roboto Slab', ui-serif, Georgia, serif;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    /* ================================
+       ROBOTO SLAB = UI / TITLES / LABELS
+       ================================ */
+    h1, h2, h3, h4, h5, h6,
+    header,
+    button,
+    nav,
+    .font-display {
         font-family: 'Roboto Slab', ui-serif, Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    /* UI labels like "Weekly Mood", "Today", etc. */
+    .uppercase,
+    span.uppercase,
+    h2.uppercase {
+        font-family: 'Roboto Slab', ui-serif, Georgia, serif !important;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+    }
+
+    /* ================================
+       VARTA = PARAGRAPH / DESCRIPTION
+       ================================ */
+    p.text-xs,
+    p.text-sm,
+    .text-muted-foreground,
+    li,
+    small,
+    label,
+    input,
+    textarea {
+        font-family: 'Varta', system-ui, sans-serif;
+        font-weight: 400;
+    }
+
+    /* Big numbers (font-display inside <p>) stay Roboto */
+    p.font-display,
+    p.font-display * {
+        font-family: 'Roboto Slab', ui-serif, Georgia, serif !important;
     }
 }
 
+/* ================================
+   UTILITIES
+   ================================ */
 @layer utilities {
+    .gradient-hero {
+        background: var(--gradient-hero);
+    }
+
     .gradient-calm {
         background: var(--gradient-calm);
     }
 
-    .gradient-warm {
-        background: var(--gradient-warm);
-    }
-
     .gradient-card {
         background: var(--gradient-card);
-    }
-
-    .gradient-hero {
-        background: var(--gradient-hero);
     }
 
     .shadow-soft {
@@ -150,10 +148,6 @@
 
     .shadow-card {
         box-shadow: var(--shadow-card);
-    }
-
-    .shadow-elevated {
-        box-shadow: var(--shadow-elevated);
     }
 
     .mood-great {
@@ -174,65 +168,5 @@
 
     .mood-bad {
         background-color: hsl(var(--mood-bad));
-    }
-
-    .glass {
-        @apply backdrop-blur-xl bg-card/80;
-    }
-
-    .animate-float {
-        animation: float 6s ease-in-out infinite;
-    }
-
-    .animate-pulse-soft {
-        animation: pulse-soft 3s ease-in-out infinite;
-    }
-
-    .animate-slide-up {
-        animation: slide-up 0.5s ease-out;
-    }
-
-    .animate-fade-in {
-        animation: fade-in 0.4s ease-out;
-    }
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-@keyframes pulse-soft {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.02);
-    }
-}
-
-@keyframes slide-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fade-in {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
     }
 }
