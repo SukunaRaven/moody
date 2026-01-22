@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Send, Bot, User, Sparkles, Lock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import {useState} from 'react';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Send, Sparkles, Lock} from 'lucide-react';
+import {cn} from '@/lib/utils';
 
 interface Message {
     id: string;
@@ -25,9 +25,6 @@ const Chat = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [apiConnected] = useState(true);
 
-    // -----------------------------
-    // MEMORY + FASTAPI AI CALL
-    // -----------------------------
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -43,7 +40,6 @@ const Chat = () => {
         setIsLoading(true);
 
         try {
-            // Convert entire conversation for the backend
             const apiMessages = [...messages, userMessage].map((m) => ({
                 role: m.role,
                 content: m.content,
@@ -51,8 +47,8 @@ const Chat = () => {
 
             const res = await fetch('http://localhost:8000/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: apiMessages }),
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({messages: apiMessages}),
             });
 
             const data = await res.json();
@@ -65,42 +61,45 @@ const Chat = () => {
             };
 
             setMessages((prev) => [...prev, assistantMessage]);
-        } catch (err) {
-            console.error(err);
-
-            const fallback: Message = {
-                id: crypto.randomUUID(),
-                role: 'assistant',
-                content: 'Sorry, I could not reach the AI.',
-                timestamp: new Date(),
-            };
-
-            setMessages((prev) => [...prev, fallback]);
+        } catch {
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: crypto.randomUUID(),
+                    role: 'assistant',
+                    content: 'Sorry, I could not reach the AI.',
+                    timestamp: new Date(),
+                },
+            ]);
         }
 
         setIsLoading(false);
     };
 
     return (
-        <div className="flex flex-col h-screen bg-background">
+        <div className="flex flex-col h-screen !bg-[#F2F0FF] !text-[#051A2F]">
             {/* Header */}
-            <header className="px-6 pt-8 pb-4 shrink-0">
+            <header className="px-6 pt-8 pb-5 shrink-0">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full gradient-calm flex items-center justify-center">
-                        <Bot className="w-6 h-6 text-primary-foreground" />
-                    </div>
+                    <img
+                        src="/image/moody-chatbot.png"
+                        alt="Moody assistant"
+                        className="w-10 h-10 rounded-2xl bg-white shadow-sm p-1 border border-black/5"
+                    />
                     <div>
-                        <h1 className="font-display text-xl font-bold">Chat with Moody</h1>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <h1 className="font-display text-lg font-semibold">
+                            Chat with Moody
+                        </h1>
+                        <p className="text-[11px] font-semibold tracking-[0.16em] uppercase text-[#6B7280] flex items-center gap-2">
                             {apiConnected ? (
                                 <>
-                                    <Sparkles className="w-3 h-3" />
+                                    <Sparkles className="w-3.5 h-3.5"/>
                                     AI-powered support
                                 </>
                             ) : (
                                 <>
-                                    <Lock className="w-3 h-3" />
-                                    Demo mode - Connect API for full experience
+                                    <Lock className="w-3.5 h-3.5"/>
+                                    Demo mode
                                 </>
                             )}
                         </p>
@@ -115,56 +114,61 @@ const Chat = () => {
                         <div
                             key={message.id}
                             className={cn(
-                                'flex gap-3 animate-fade-in',
-                                message.role === 'user' ? 'flex-row-reverse' : ''
+                                'flex animate-fade-in',
+                                message.role === 'user'
+                                    ? 'justify-end'
+                                    : 'justify-start'
                             )}
-                            style={{ animationDelay: `${index * 100}ms` }}
+                            style={{animationDelay: `${index * 80}ms`}}
                         >
-                            <div
-                                className={cn(
-                                    'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-                                    message.role === 'user'
-                                        ? 'bg-primary/10'
-                                        : 'gradient-calm'
-                                )}
-                            >
-                                {message.role === 'user' ? (
-                                    <User className="w-4 h-4 text-primary" />
-                                ) : (
-                                    <Bot className="w-4 h-4 text-primary-foreground" />
-                                )}
-                            </div>
-                            <div
-                                className={cn(
-                                    'max-w-[80%] rounded-2xl px-4 py-3',
-                                    message.role === 'user'
-                                        ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                                        : 'bg-card shadow-soft rounded-tl-sm'
-                                )}
-                            >
-                                <p className="text-sm leading-relaxed">{message.content}</p>
-                            </div>
+                            {/* ASSISTANT MESSAGE */}
+                            {message.role === 'assistant' && (
+                                <div className="flex gap-3 max-w-[85%]">
+                                    <div
+                                        className="bg-white border border-black/5 shadow-sm rounded-2xl rounded-tl-sm px-4 py-3 flex gap-3">
+                                        <img
+                                            src="/image/moody-chatbot.png"
+                                            alt="Moody assistant"
+                                            className="w-8 h-8 rounded-xl bg-[#F2F0FF] p-1 shrink-0"
+                                        />
+                                        <p className="text-sm leading-relaxed">
+                                            {message.content}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* USER MESSAGE */}
+                            {message.role === 'user' && (
+                                <div
+                                    className="bg-[#2C5FCB] text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[80%] shadow-sm">
+                                    <p className="text-sm leading-relaxed">
+                                        {message.content}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     ))}
 
+                    {/* Typing indicator */}
                     {isLoading && (
-                        <div className="flex gap-3 animate-fade-in">
-                            <div className="w-8 h-8 rounded-full gradient-calm flex items-center justify-center">
-                                <Bot className="w-4 h-4 text-primary-foreground" />
-                            </div>
-                            <div className="bg-card shadow-soft rounded-2xl rounded-tl-sm px-4 py-3">
-                                <div className="flex gap-1">
+                        <div className="flex justify-start">
+                            <div
+                                className="bg-white border border-black/5 shadow-sm rounded-2xl rounded-tl-sm px-4 py-3 flex gap-2 items-center">
+                                <img
+                                    src="/image/moody-chatbot.png"
+                                    alt="Moody assistant"
+                                    className="w-7 h-7 rounded-xl bg-[#F2F0FF] p-1"
+                                />
+                                <div className="flex gap-1.5">
+                                    <span className="w-2 h-2 bg-[#2C5FCB]/40 rounded-full animate-bounce"/>
                                     <span
-                                        className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"
-                                        style={{ animationDelay: '0ms' }}
+                                        className="w-2 h-2 bg-[#2C5FCB]/40 rounded-full animate-bounce"
+                                        style={{animationDelay: '150ms'}}
                                     />
                                     <span
-                                        className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"
-                                        style={{ animationDelay: '150ms' }}
-                                    />
-                                    <span
-                                        className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"
-                                        style={{ animationDelay: '300ms' }}
+                                        className="w-2 h-2 bg-[#2C5FCB]/40 rounded-full animate-bounce"
+                                        style={{animationDelay: '300ms'}}
                                     />
                                 </div>
                             </div>
@@ -174,7 +178,7 @@ const Chat = () => {
             </main>
 
             {/* Input */}
-            <div className="shrink-0 p-4 pb-24 bg-background border-t border-border">
+            <div className="shrink-0 p-4 pb-24 !bg-[#F2F0FF] border-t border-black/5">
                 <div className="max-w-2xl mx-auto flex gap-3">
                     <Input
                         value={input}
@@ -183,7 +187,7 @@ const Chat = () => {
                             e.key === 'Enter' && !e.shiftKey && handleSend()
                         }
                         placeholder="Share what's on your mind..."
-                        className="flex-1 rounded-xl"
+                        className="flex-1 rounded-2xl bg-white border border-black/5 shadow-sm focus-visible:ring-0"
                         disabled={isLoading}
                     />
                     <Button
@@ -191,8 +195,9 @@ const Chat = () => {
                         size="icon"
                         onClick={handleSend}
                         disabled={!input.trim() || isLoading}
+                        className="!rounded-2xl !bg-[#2C5FCB] !text-white !shadow-sm hover:!bg-[#244FA7]"
                     >
-                        <Send className="w-5 h-5" />
+                        <Send className="w-5 h-5"/>
                     </Button>
                 </div>
             </div>
