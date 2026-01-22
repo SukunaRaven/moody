@@ -43,9 +43,20 @@ export function useDailyRoutine() {
         });
     }
 
+    // NEW: remove a task from today
+    function deleteTask(taskId: string) {
+        const updated = getTodayRoutine().filter((t) => t.taskId !== taskId);
+
+        setHistory({
+            ...history,
+            [today]: updated,
+        });
+    }
+
     return {
         todayRoutine: getTodayRoutine(),
         toggleTask,
+        deleteTask, // NEW EXPORT
         coachData,
     };
 }

@@ -13,10 +13,10 @@ export default function CoachSetup() {
     });
 
     const [taskLabel, setTaskLabel] = useState("");
-    const [taskDuration, setTaskDuration] = useState(10);
+    const [taskDuration, setTaskDuration] = useState<number | "">("");
 
     function addTask() {
-        if (!taskLabel.trim()) return;
+        if (!taskLabel.trim() || !taskDuration) return;
 
         setCoachData({
             ...coachData,
@@ -25,13 +25,21 @@ export default function CoachSetup() {
                 {
                     id: crypto.randomUUID(),
                     label: taskLabel.trim(),
-                    duration: taskDuration,
+                    duration: Number(taskDuration),
                 },
             ],
         });
 
         setTaskLabel("");
-        setTaskDuration(10);
+        setTaskDuration("");
+    }
+
+    // NEW: delete task
+    function deleteTask(id: string) {
+        setCoachData({
+            ...coachData,
+            tasks: coachData.tasks.filter((t) => t.id !== id),
+        });
     }
 
     return (
@@ -40,6 +48,7 @@ export default function CoachSetup() {
                 Set Up Your Daily Routine
             </h1>
 
+            {/* Wake Time */}
             <Card>
                 <CardHeader>
                     <CardTitle>Wake Time</CardTitle>
@@ -58,6 +67,7 @@ export default function CoachSetup() {
                 </CardContent>
             </Card>
 
+            {/* Add Task */}
             <Card>
                 <CardHeader>
                     <CardTitle>Add Task</CardTitle>
@@ -73,9 +83,14 @@ export default function CoachSetup() {
                         type="number"
                         min={1}
                         max={300}
+                        placeholder="Time"
                         value={taskDuration}
                         onChange={(e) =>
-                            setTaskDuration(Number(e.target.value))
+                            setTaskDuration(
+                                e.target.value === ""
+                                    ? ""
+                                    : Number(e.target.value)
+                            )
                         }
                     />
 
@@ -85,24 +100,36 @@ export default function CoachSetup() {
                 </CardContent>
             </Card>
 
+            {/* Current Tasks */}
             {coachData.tasks.length > 0 && (
                 <Card>
                     <CardHeader>
                         <CardTitle>Current Tasks</CardTitle>
                     </CardHeader>
+
                     <CardContent className="space-y-2">
                         {coachData.tasks.map((task) => (
                             <div
                                 key={task.id}
-                                className="p-3 border rounded-lg text-sm"
+                                className="flex justify-between items-center p-3 border rounded-lg text-sm"
                             >
-                                {task.label} — {task.duration} min
+                                <span>
+                                    {task.label} — {task.duration} min
+                                </span>
+
+                                <button
+                                    onClick={() => deleteTask(task.id)}
+                                    className="text-muted-foreground hover:text-destructive transition-colors"
+                                >
+                                    Remove
+                                </button>
                             </div>
                         ))}
                     </CardContent>
                 </Card>
             )}
 
+            {/* Save */}
             <Button className="w-full" asChild>
                 <a href="/coach">Finish Setup</a>
             </Button>

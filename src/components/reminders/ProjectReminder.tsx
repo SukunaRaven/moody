@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar, Plus, Trash2, Bell } from 'lucide-react';
+import { Calendar, Plus, Trash2, Bell, Edit3 } from 'lucide-react';
 import { format, differenceInDays, isPast, isToday } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ export function ProjectReminders() {
     const [reminders, setReminders] = useState<Reminder[]>(() => {
         const stored = localStorage.getItem('moody_reminders');
         if (stored) {
-            return JSON.parse(stored).map((r: any) => ({
+            return JSON.parse(stored).map((r: Reminder) => ({
                 ...r,
                 dueDate: new Date(r.dueDate)
             }));
@@ -26,6 +26,11 @@ export function ProjectReminders() {
     const [showForm, setShowForm] = useState(false);
     const [title, setTitle] = useState('');
     const [dueDate, setDueDate] = useState('');
+
+    // NEW: edit state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editDueDate, setEditDueDate] = useState('');
 
     const saveReminders = (newReminders: Reminder[]) => {
         localStorage.setItem('moody_reminders', JSON.stringify(newReminders));
@@ -41,9 +46,11 @@ export function ProjectReminders() {
             dueDate: new Date(dueDate)
         };
 
-        saveReminders([...reminders, newReminder].sort((a, b) =>
-            a.dueDate.getTime() - b.dueDate.getTime()
-        ));
+        saveReminders(
+            [...reminders, newReminder].sort(
+                (a, b) => a.dueDate.getTime() - b.dueDate.getTime()
+            )
+        );
 
         setTitle('');
         setDueDate('');
@@ -51,7 +58,30 @@ export function ProjectReminders() {
     };
 
     const removeReminder = (id: string) => {
-        saveReminders(reminders.filter(r => r.id !== id));
+        saveReminders(reminders.filter((r) => r.id !== id));
+    };
+
+    // NEW: begin editing
+    const startEdit = (reminder: Reminder) => {
+        setEditingId(reminder.id);
+        setEditTitle(reminder.title);
+        setEditDueDate(format(reminder.dueDate, 'yyyy-MM-dd'));
+    };
+
+    // NEW: save edited reminder
+    const saveEdit = () => {
+        if (!editingId) return;
+
+        const updated = reminders.map((r) =>
+            r.id === editingId
+                ? { ...r, title: editTitle, dueDate: new Date(editDueDate) }
+                : r
+        );
+
+        saveReminders(updated);
+        setEditingId(null);
+        setEditTitle('');
+        setEditDueDate('');
     };
 
     const getDaysText = (date: Date) => {
@@ -76,11 +106,7 @@ export function ProjectReminders() {
                     <Calendar className="w-5 h-5 text-primary" />
                     <h3 className="font-display font-semibold">School Projects</h3>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowForm(!showForm)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setShowForm(!showForm)}>
                     <Plus className="w-4 h-4" />
                     Add
                 </Button>
@@ -88,17 +114,9 @@ export function ProjectReminders() {
 
             {showForm && (
                 <div className="p-4 rounded-xl bg-muted/50 space-y-3 animate-fade-in">
-                    <Input
-                        placeholder="Project name..."
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                    <Input
-                        type="date"
-                        value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                        min={format(new Date(), 'yyyy-MM-dd')}
-                    />
+                    <Input placeholder="Project name..." value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} min={format(new Date(), 'yyyy-MM-dd')} />
+
                     <div className="flex gap-2">
                         <Button size="sm" onClick={addReminder} disabled={!title || !dueDate}>
                             Add Reminder
@@ -111,42 +129,57 @@ export function ProjectReminders() {
             )}
 
             {reminders.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                    No upcoming deadlines
-                </p>
+                <p className="text-sm text-muted-foreground text-center py-4">No upcoming deadlines</p>
             ) : (
                 <div className="space-y-2">
                     {reminders.map((reminder) => (
-                        <div
-                            key={reminder.id}
-                            className={cn(
-                                "flex items-center gap-3 p-3 rounded-xl border transition-colors",
-                                getUrgencyClass(reminder.dueDate)
+                        <div key={reminder.id}>
+                            {/* EDIT MODE */}
+                            {editingId === reminder.id ? (
+                                <div className="p-3 rounded-xl border bg-muted/40 space-y-3">
+                                    <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+                                    <Input type="date" value={editDueDate} onChange={(e) => setEditDueDate(e.target.value)} />
+
+                                    <div className="flex gap-2">
+                                        <Button size="sm" onClick={saveEdit}>Save</Button>
+                                        <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* NORMAL DISPLAY */
+                                <div className={cn("flex items-center gap-3 p-3 rounded-xl border transition-colors", getUrgencyClass(reminder.dueDate))}>
+                                    <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium truncate">{reminder.title}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {format(reminder.dueDate, 'MMM d, yyyy')}
+                                        </p>
+                                    </div>
+
+                                    <span
+                                        className={cn(
+                                            "text-xs font-semibold px-2 py-1 rounded-full",
+                                            isPast(reminder.dueDate) && !isToday(reminder.dueDate)
+                                                ? 'bg-destructive/20 text-destructive'
+                                                : differenceInDays(reminder.dueDate, new Date()) <= 3
+                                                    ? 'bg-accent/20 text-accent'
+                                                    : 'bg-primary/20 text-primary'
+                                        )}
+                                    >
+                                        {getDaysText(reminder.dueDate)}
+                                    </span>
+
+                                    <button className="text-muted-foreground hover:text-primary transition-colors" onClick={() => startEdit(reminder)}>
+                                        <Edit3 className="w-4 h-4" />
+                                    </button>
+
+                                    <button className="text-muted-foreground hover:text-destructive transition-colors" onClick={() => removeReminder(reminder.id)}>
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             )}
-                        >
-                            <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">{reminder.title}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {format(reminder.dueDate, 'MMM d, yyyy')}
-                                </p>
-                            </div>
-                            <span className={cn(
-                                "text-xs font-semibold px-2 py-1 rounded-full",
-                                isPast(reminder.dueDate) && !isToday(reminder.dueDate)
-                                    ? "bg-destructive/20 text-destructive"
-                                    : differenceInDays(reminder.dueDate, new Date()) <= 3
-                                        ? "bg-accent/20 text-accent"
-                                        : "bg-primary/20 text-primary"
-                            )}>
-                {getDaysText(reminder.dueDate)}
-              </span>
-                            <button
-                                onClick={() => removeReminder(reminder.id)}
-                                className="text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
                         </div>
                     ))}
                 </div>

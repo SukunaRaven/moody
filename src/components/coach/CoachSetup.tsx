@@ -13,10 +13,11 @@ export default function CoachSetup() {
     });
 
     const [taskLabel, setTaskLabel] = useState("");
-    const [taskDuration, setTaskDuration] = useState(10);
+    const [taskDuration, setTaskDuration] = useState<number | "">("");
 
     function addTask() {
-        if (!taskLabel.trim()) return;
+        if (!taskLabel.trim() || !taskDuration) return;
+
         setCoachData({
             ...coachData,
             tasks: [
@@ -24,36 +25,50 @@ export default function CoachSetup() {
                 {
                     id: crypto.randomUUID(),
                     label: taskLabel.trim(),
-                    duration: taskDuration,
+                    duration: Number(taskDuration),
                     completed: false,
                 },
             ],
         });
 
         setTaskLabel("");
-        setTaskDuration(10);
+        setTaskDuration("");
+    }
+
+    // NEW: delete a task during setup
+    function deleteTask(id: string) {
+        setCoachData({
+            ...coachData,
+            tasks: coachData.tasks.filter((t) => t.id !== id),
+        });
     }
 
     return (
         <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-            <h1 className="text-2xl font-bold tracking-tight">Set Up Your Daily Routine</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+                Set Up Your Daily Routine
+            </h1>
 
+            {/* Wake Time */}
             <Card>
                 <CardHeader>
                     <CardTitle>Wake Time</CardTitle>
                 </CardHeader>
-
                 <CardContent className="space-y-4">
                     <Input
                         type="time"
                         value={coachData.wakeTime}
                         onChange={(e) =>
-                            setCoachData({ ...coachData, wakeTime: e.target.value })
+                            setCoachData({
+                                ...coachData,
+                                wakeTime: e.target.value,
+                            })
                         }
                     />
                 </CardContent>
             </Card>
 
+            {/* Add Task */}
             <Card>
                 <CardHeader>
                     <CardTitle>Add Routine Task</CardTitle>
@@ -70,8 +85,15 @@ export default function CoachSetup() {
                         type="number"
                         min={1}
                         max={300}
+                        placeholder="Time"
                         value={taskDuration}
-                        onChange={(e) => setTaskDuration(Number(e.target.value))}
+                        onChange={(e) =>
+                            setTaskDuration(
+                                e.target.value === ""
+                                    ? ""
+                                    : Number(e.target.value)
+                            )
+                        }
                     />
 
                     <Button onClick={addTask} className="w-full">
@@ -80,6 +102,7 @@ export default function CoachSetup() {
                 </CardContent>
             </Card>
 
+            {/* Current Tasks */}
             {coachData.tasks.length > 0 && (
                 <Card>
                     <CardHeader>
@@ -98,12 +121,20 @@ export default function CoachSetup() {
                                         {task.duration} min
                                     </p>
                                 </div>
+
+                                <button
+                                    onClick={() => deleteTask(task.id)}
+                                    className="text-muted-foreground hover:text-destructive transition-colors"
+                                >
+                                    Remove
+                                </button>
                             </div>
                         ))}
                     </CardContent>
                 </Card>
             )}
 
+            {/* Save */}
             <Button variant="default" className="w-full" asChild>
                 <a href="/coach">Finish Setup</a>
             </Button>

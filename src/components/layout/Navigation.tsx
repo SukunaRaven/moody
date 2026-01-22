@@ -1,11 +1,12 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, PlusCircle, BarChart3, MessageCircle, HeartHandshake } from 'lucide-react';
+import { Home, PlusCircle, BarChart3, BarChart2, MessageCircle, HeartHandshake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
     { to: '/', icon: Home, label: 'Home' },
     { to: '/log', icon: PlusCircle, label: 'Log' },
     { to: '/insights', icon: BarChart3, label: 'Insights' },
+    { to: '/summary', icon: BarChart2, label: 'Summary' },
     { to: '/coach', icon: HeartHandshake, label: 'CoachSetup' },
     { to: '/chat', icon: MessageCircle, label: 'Chat' },
 ];

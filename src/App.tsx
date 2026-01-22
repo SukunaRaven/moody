@@ -10,6 +10,7 @@ import Insights from "./pages/Insights";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import CoachSetup from "@/pages/CoachSetup.tsx";
+import LogSummary from "@/pages/LogSummary.tsx";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
                 <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/log" element={<Log />} />
+                    <Route path="/summary" element={<LogSummary />} />
                     <Route path="/insights" element={<Insights />} />
                     <Route path="/coach" element={<CoachSetup />} />
                     <Route path="/chat" element={<Chat />} />

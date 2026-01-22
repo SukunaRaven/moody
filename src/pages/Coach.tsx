@@ -1,10 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Circle } from "lucide-react";
+import { CheckCircle, Circle, Trash2 } from "lucide-react";
 import { useDailyRoutine } from "@/hooks/useDailyRoutine";
 
 export default function Coach() {
-    const { todayRoutine, toggleTask, coachData } = useDailyRoutine();
+    const { todayRoutine, toggleTask, deleteTask, coachData } = useDailyRoutine();
 
     return (
         <div className="max-w-md mx-auto px-4 py-6 space-y-6">
@@ -19,8 +19,8 @@ export default function Coach() {
                 </p>
             ) : (
                 todayRoutine.map((t) => {
-                    // find the static template task
-                    const task = coachData.tasks.find(task => task.id === t.taskId);
+                    // Match with template task
+                    const task = coachData.tasks.find((task) => task.id === t.taskId);
                     if (!task) return null;
 
                     return (
@@ -28,24 +28,33 @@ export default function Coach() {
                             <CardContent className="py-4 flex justify-between items-center">
                                 <div>
                                     <p className="font-medium">{task.label}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {task.duration} min
-                                    </p>
+                                    <p className="text-sm text-muted-foreground">{task.duration} min</p>
                                 </div>
 
-                                {/* NOTICE: completed comes from `t`, NOT from `task` */}
-                                <Button
-                                    variant={t.completed ? "default" : "outline"}
-                                    onClick={() => toggleTask(task.id)}
-                                    className="flex gap-2"
-                                >
-                                    {t.completed ? (
-                                        <CheckCircle className="w-5 h-5" />
-                                    ) : (
-                                        <Circle className="w-5 h-5" />
-                                    )}
-                                    {t.completed ? "Done" : "Start"}
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    {/* Toggle complete */}
+                                    <Button
+                                        variant={t.completed ? "default" : "outline"}
+                                        onClick={() => toggleTask(task.id)}
+                                        className="flex gap-2"
+                                    >
+                                        {t.completed ? (
+                                            <CheckCircle className="w-5 h-5" />
+                                        ) : (
+                                            <Circle className="w-5 h-5" />
+                                        )}
+                                        {t.completed ? "Done" : "Start"}
+                                    </Button>
+
+                                    {/* NEW: Remove task for today */}
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => deleteTask(task.id)}
+                                        className="p-2 text-muted-foreground hover:text-destructive"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </Button>
+                                </div>
                             </CardContent>
                         </Card>
                     );
