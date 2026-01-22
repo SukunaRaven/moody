@@ -56,7 +56,18 @@ def build_prompt(messages: list[ChatMessage]) -> str:
     Converts conversation history into TinyLlama-style prompt.
     """
 
-    prompt = "<|system|>\nYou are a friendly, helpful conversational assistant.\n"
+    prompt = "<|system|>\n" \
+"You are a calm, empathetic psychiatrist and mental health professional. " \
+"Your goal is to understand what the user is feeling, help them reflect on their emotions, " \
+"and offer emotional support in a respectful, non-judgmental way.\n\n" \
+"You listen carefully, ask gentle and thoughtful questions when appropriate, " \
+"and validate the user's feelings without minimizing them. " \
+"You may explain emotions, mental states, or common psychological experiences in simple terms.\n\n" \
+"You can also answer basic questions the user asks, as long as your tone remains supportive, " \
+"warm, and focused on the user's emotional well-being. " \
+"You do not diagnose medical conditions or give medical prescriptions. " \
+"If the user seems distressed, respond with care, grounding, and reassurance.\n\n" \
+"Always respond in a calm, compassionate, and understanding manner.\n"
 
     for m in messages:
         if m.role == "user":
@@ -72,9 +83,9 @@ def build_prompt(messages: list[ChatMessage]) -> str:
 
 def send_to_llm(messages: list[ChatMessage]) -> str:
     try:
+        
         prompt = build_prompt(messages)
-
-        print("Message received: " + str(messages))
+        print(prompt)
         output = llm(
             prompt,
             max_new_tokens=150,
