@@ -40,10 +40,19 @@ const Index = () => {
                         <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-[#6B7280]">
                             {format(new Date(), 'EEEE, MMMM d')}
                         </p>
-                        <h1 className="font-display text-[22px] leading-tight font-semibold text-[#051A2F]">
-                            Hey there 👋
-                        </h1>
+
+                        <div className="flex items-center gap-3">
+                            <img
+                                src="/image/moody-chatbot.png"
+                                alt="Moody assistant"
+                                className="w-9 h-9 rounded-xl bg-white shadow-sm p-1"
+                            />
+                            <h1 className="font-display text-[22px] leading-tight font-semibold text-[#051A2F]">
+                                Hey there 👋
+                            </h1>
+                        </div>
                     </div>
+
                     <Link to="/log">
                         <Button
                             variant="mood"
